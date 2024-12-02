@@ -29,10 +29,9 @@ async function final() {
         difference += 0;
       }
     }
-    console.log(difference);
   });
 
-  return;
+  return difference;
 }
 
 final();
