@@ -1,34 +1,58 @@
-const fs = require("fs");
+const fs = require("fs/promises");
 
-async function final() {
-  await fs.readFile("./assets/Day_TWO.txt", "utf8", (err, data) => {
-    const levels = data.split("\n");
-    let safeCount = 0;
-    for (let i = 0; i < levels.length; i++) {
-      let nums = levels[i].split(" ").map((x) => {
-        return Number(x);
-      });
-      let safe = true;
+let count = 0;
 
-      let DIR = 1;
-      if (nums[1] < nums[0]) {
-        DIR = -1;
-      }
+fs.readFile("./assets/Day_TWO.txt", "utf-8").then((d) => {
+  const levels = d.split("\n");
+  let safeTotal = 0;
+  for (let i = 0; i < levels.length; i++) {
+    const nums = levels[i].split(" ").map((x) => {
+      return Number(x);
+    });
+    count = 0;
+    const safe = analyseData(nums);
+    if (safe) {
+      safeTotal++;
+    }
+  }
+  console.log(safeTotal);
+});
 
-      for (let j = 0; j < nums.length; j++) {
-        if (
-          (nums[j + 1] - nums[j]) * DIR > 3 ||
-          (nums[j + 1] - nums[j]) * DIR < 1
-        ) {
-          safe = false;
+function analyseData(nums) {
+  let safe = true;
+  let asc = 1;
+
+  if (nums[0] > nums[1]) {
+    asc = -1;
+  }
+
+  for (let j = 0; j < nums.length - 1; j++) {
+    if (
+      (nums[j + 1] - nums[j]) * asc <= 0 ||
+      (nums[j + 1] - nums[j]) * asc > 3
+    ) {
+      safe = false;
+    }
+  }
+  if (safe) {
+    return true;
+  } else {
+    count++;
+    let total = 0;
+    if (count < 2) {
+      for (let k = 0; k < nums.length; k++) {
+        const newNums = nums.filter((num, index) => {
+          return index !== k;
+        });
+        if (analyseData(newNums)) {
+          total++;
         }
       }
-      if (safe === true) {
-        safeCount++;
-        console.log(nums)
+      if (total > 0) {
+        return true;
+      } else {
+        return false;
       }
     }
-    console.log(safeCount);
-  });
+  }
 }
-final();
